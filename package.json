@@ -1,0 +1,19 @@
+{
+  "name": "webcrawler",
+  "version": "1.0.0",
+  "description": "a typescript webcrawler",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test",
+    "start": "ts-node src/main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.9",
+    "prettier": "^3.8.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
