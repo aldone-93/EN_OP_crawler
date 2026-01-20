@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "Debug TypeScript",
       "runtimeArgs": ["-r", "ts-node/register"],
-      "args": ["${workspaceFolder}/src/seriesOptionsCrawler.ts"],
+      "args": ["${workspaceFolder}/src/priceRetriever.ts"],
       "cwd": "${workspaceFolder}",
       "sourceMaps": true,
       "console": "integratedTerminal"
