@@ -1,4 +1,4 @@
-import { Card } from './types/card.type';
+import { Card } from '../types/card.type';
 
 export async function getCardListFromId(series: string) {
   const url = 'https://en.onepiece-cardgame.com/cardlist/';
