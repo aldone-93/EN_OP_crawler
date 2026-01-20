@@ -1,5 +1,4 @@
 import cron from 'node-cron';
-import { writeFileSync } from 'fs';
 import { getSinglesList } from './singleList';
 import { getPriceList } from './priceList';
 import { getDBClient } from '../core/dbAuth/mongoAuth';
