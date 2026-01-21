@@ -1,8 +1,15 @@
 import 'dotenv/config';
 import { MongoClient, ServerApiVersion } from 'mongodb';
 
-const mongoPass = process.env.MONGO_PASS; // Legge da .env
-const uri = `mongodb+srv://aldone93:${mongoPass}@cluster0.cve1h0c.mongodb.net/?appName=Cluster0`;
+const mongoUser = process.env.MONGO_USER;
+const mongoPass = process.env.MONGO_PASS;
+const mongoCluster = process.env.MONGO_CLUSTER;
+
+if (!mongoPass) {
+  throw new Error('MONGO_PASS environment variable is required');
+}
+
+const uri = `mongodb+srv://${mongoUser}:${mongoPass}@${mongoCluster}/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {

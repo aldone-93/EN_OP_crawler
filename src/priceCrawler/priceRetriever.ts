@@ -4,6 +4,7 @@ import { getPriceList } from './priceList';
 import { getDBClient } from '../core/dbAuth/mongoAuth';
 
 // Ogni giorno alle 2:00 AM
+console.log('Starting CRON...');
 cron.schedule('0 2 * * *', async () => {
   console.log('Downloading and merging data...');
   await downloadAndMerge();
