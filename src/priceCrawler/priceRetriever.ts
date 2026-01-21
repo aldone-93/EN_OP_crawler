@@ -58,5 +58,3 @@ async function downloadAndMerge() {
 
   return merged;
 }
-
-downloadAndMerge();
