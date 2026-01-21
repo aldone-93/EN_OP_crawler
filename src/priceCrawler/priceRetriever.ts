@@ -56,5 +56,3 @@ async function downloadAndMerge() {
 
   console.log(`[${timestamp.toISOString()}] Update completed`);
 }
-
-downloadAndMerge();
