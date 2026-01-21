@@ -10,7 +10,9 @@
     "test": "npm test",
     "start": "concurrently \"ts-node src/app.ts\" \"ts-node src/priceCrawler/priceRetriever.ts\"",
     "app": "ts-node src/app.ts",
-    "cron": "ts-node src/priceCrawler/priceRetriever.ts"
+    "api": "ts-node src/api/server.ts",
+    "cron": "ts-node src/priceCrawler/priceRetriever.ts",
+    "startAll": "concurrently \"ts-node src/app.ts\" \"ts-node src/api/server.ts\" \"ts-node src/priceCrawler/priceRetriever.ts\""
   },
   "devDependencies": {
     "@types/node": "^25.0.9",

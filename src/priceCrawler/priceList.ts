@@ -11,5 +11,5 @@ export async function getPriceList() {
   const { priceGuides } = await pricesResponse.json();
 
   // Crea una mappa dei prezzi per lookup veloce
-  return new Map(priceGuides.map((p: any) => [p.idProduct, p]));
+  return priceGuides;
 }

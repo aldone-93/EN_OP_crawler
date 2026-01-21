@@ -11,51 +11,50 @@ cron.schedule('0 2 * * *', async () => {
 });
 
 async function downloadAndMerge() {
-  const products = await getSinglesList();
-  const priceMap = await getPriceList();
+  const productsList = await getSinglesList();
+  const priceList = await getPriceList();
 
-  const merged = products.map((product: any) => ({
-    ...product,
-    pricing: priceMap.get(product.idProduct) || null,
+  console.log(`Fetched ${productsList.length} products and ${priceList.length} prices`);
+
+  const client = await getDBClient();
+  const db = client.db('marketData');
+
+  // Collection 1: Products (dati statici, senza prezzi)
+  const productsCollection = db.collection('products');
+
+  // Collection 2: Prices (time series)
+  const pricesCollection = db.collection('priceHistory');
+
+  const timestamp = new Date();
+
+  // Upsert dei prodotti (solo dati statici, no prezzi)
+  const productBulkOps = productsList.map((product: any) => ({
+    updateOne: {
+      filter: { idProduct: product.idProduct },
+      update: {
+        $set: { ...product },
+      },
+      upsert: true,
+    },
   }));
 
-  getDBClient().then(async (client) => {
-    const db = client.db('marketData');
-    const collection = db.collection('products');
+  if (productBulkOps.length > 0) {
+    const productResult = await productsCollection.bulkWrite(productBulkOps);
+    console.log(`Products: ${productResult.modifiedCount} updated, ${productResult.upsertedCount} inserted`);
+  }
 
-    const timestamp = new Date();
+  // Insert dei prezzi come time series
+  const priceDocuments = priceList.map((price: any) => ({
+    ...price,
+    timestamp,
+  }));
 
-    // Per ogni prodotto, aggiungi il prezzo all'array storico
-    const bulkOps = merged.map((product: any) => ({
-      updateOne: {
-        filter: { idProduct: product.idProduct },
-        update: {
-          $setOnInsert: {
-            idProduct: product.idProduct,
-            name: product.name,
-            idCategory: product.idCategory,
-            categoryName: product.categoryName,
-            idExpansion: product.idExpansion,
-            idMetacard: product.idMetacard,
-            dateAdded: product.dateAdded,
-          },
-          $push: {
-            priceHistory: {
-              timestamp,
-              ...product.pricing,
-            },
-          },
-        },
-        upsert: true,
-      },
-    }));
+  if (priceDocuments.length > 0) {
+    const priceResult = await pricesCollection.insertMany(priceDocuments);
+    console.log(`Prices: ${priceResult.insertedCount} records inserted`);
+  }
 
-    await collection.bulkWrite(bulkOps);
-
-    console.log(`Database updated with ${merged.length} products price history`);
-    client.close();
-  });
-  console.log(`Merged ${merged.length} products`);
-
-  return merged;
+  console.log(`[${timestamp.toISOString()}] Update completed`);
 }
+
+downloadAndMerge();
