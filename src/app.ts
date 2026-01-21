@@ -22,47 +22,6 @@ function authenticate(req: express.Request, res: express.Response, next: express
   next();
 }
 
-// Health check endpoint
-app.get('/health', authenticate, async (req, res) => {
-  try {
-    const client = await getDBClient();
-    const db = client.db('marketData');
-
-    await db.admin().ping();
-
-    const collection = db.collection('products');
-    const productCount = await collection.countDocuments();
-
-    const lastProduct = await collection.findOne({}, { sort: { 'priceHistory.timestamp': -1 }, projection: { priceHistory: { $slice: -1 } } });
-
-    const lastUpdate = lastProduct?.priceHistory?.[0]?.timestamp;
-
-    res.json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      database: {
-        connected: true,
-        productsCount: productCount,
-        lastUpdate: lastUpdate || null,
-      },
-      cron: {
-        schedule: '0 2 * * *',
-        description: 'Every day at 2:00 AM',
-        nextRun: getNextCronRun(),
-      },
-    });
-  } catch (error: any) {
-    console.error('Health check error:', error);
-    res.status(500).json({
-      status: 'ERROR',
-      timestamp: new Date().toISOString(),
-      database: {
-        connected: false,
-      },
-    });
-  }
-});
-
 // Endpoint per vedere gli ultimi aggiornamenti
 app.get('/status', authenticate, async (req, res) => {
   try {

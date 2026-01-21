@@ -3,7 +3,7 @@ import { getDBClient } from '../core/dbAuth/mongoAuth';
 import 'dotenv/config';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY;
 
 // Middleware per autenticazione
