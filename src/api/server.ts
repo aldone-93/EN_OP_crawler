@@ -204,7 +204,7 @@ app.get('/api/expansions', authenticate, async (req, res) => {
 });
 
 // GET / - Documentazione API
-app.get('/', (req, res) => {
+app.get('/services', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -325,5 +325,5 @@ app.get('/', (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`API server running on port ${PORT}`);
-  console.log(`Documentation: http://localhost:${PORT}`);
+  console.log(`Documentation: ${PORT}`);
 });

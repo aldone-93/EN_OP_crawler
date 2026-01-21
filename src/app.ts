@@ -104,7 +104,7 @@ app.get('/status', authenticate, async (req, res) => {
 });
 
 // Homepage con HTML
-app.get('/', (req, res) => {
+app.get('/health', (req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
