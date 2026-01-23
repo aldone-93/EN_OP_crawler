@@ -25,8 +25,6 @@ export async function downloadAndMerge() {
   // Collection 2: Prices (time series)
   const pricesCollection = db.collection('priceHistory');
 
-  const timestamp = new Date();
-
   // Upsert dei prodotti (solo dati statici, no prezzi)
   const productBulkOps = productsList.map((product: any) => ({
     updateOne: {
@@ -42,6 +40,8 @@ export async function downloadAndMerge() {
     const productResult = await productsCollection.bulkWrite(productBulkOps);
     console.log(`Products: ${productResult.modifiedCount} updated, ${productResult.upsertedCount} inserted`);
   }
+
+  const timestamp = new Date();
 
   // Insert dei prezzi come time series
   const priceDocuments = priceList.map((price: any) => ({
