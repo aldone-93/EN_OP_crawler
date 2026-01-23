@@ -1,6 +1,6 @@
 import express from 'express';
 import { getDBClient } from '../core/dbAuth/mongoAuth';
-
+import { downloadAndMerge } from '../priceCrawler/priceRetriever';
 export function setupApiRoutes(app: express.Application, authenticate: express.RequestHandler) {
   // GET /api/products - Lista prodotti con paginazione e filtri
   app.get('/api/products', authenticate, async (req, res) => {
@@ -52,6 +52,17 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
     }
   });
 
+  app.get('/api/cron', authenticate, async (req, res) => {
+    console.log('Manual cron trigger requested');
+    try {
+      await downloadAndMerge();
+
+      res.json({ message: 'Cron job triggered' });
+    } catch (error: any) {
+      console.error('Get cron status error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   // GET /api/products/:id - Dettaglio singolo prodotto
   app.get('/api/products/:id', authenticate, async (req, res) => {
     try {
