@@ -18,10 +18,13 @@ export async function getPriceList() {
 
   const priceWithDelta = await Promise.all(
     priceGuides.map(async (priceGuide: any) => {
+      const lastRecord = await priceHistory.find({ idProduct: priceGuide.idProduct }).sort({ timestamp: -1 }).limit(1).toArray();
+
       return {
         ...priceGuide,
         // Calcola la variazione di prezzo rispetto all'ultimo record nel database
-        priceDelta: await calcDelta(priceHistory, priceGuide),
+        priceDelta: await calcDelta(lastRecord, priceGuide, 'trendPrice'),
+        minPriceDelta: await calcDelta(lastRecord, priceGuide, 'low'),
       };
     })
   );
@@ -29,17 +32,15 @@ export async function getPriceList() {
   return priceWithDelta;
 }
 
-async function calcDelta(priceHistory: any, priceGuide: any) {
-  const lastRecord = await priceHistory.find({ idProduct: priceGuide.idProduct }).sort({ timestamp: -1 }).limit(1).toArray();
-
+async function calcDelta(lastRecord: any, priceGuide: any, target: string) {
   if (lastRecord.length === 0) {
     return 0; // Nessun record precedente
   }
 
-  const previousPrice = lastRecord[0]?.trend;
+  const previousPrice = lastRecord[0]?.[target];
   if (!previousPrice || previousPrice === 0) {
     return 0; // Nessun record precedente o prezzo zero
   }
   // Delta percentuale rispetto al prezzo precedente
-  return ((priceGuide.trend - previousPrice) / previousPrice) * 100;
+  return ((priceGuide[target] - previousPrice) / previousPrice) * 100;
 }

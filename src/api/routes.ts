@@ -84,6 +84,69 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
     }
   });
 
+  app.get('/api/prices', authenticate, async (req, res) => {
+    try {
+      const client = await getDBClient();
+      const db = client.db('marketData');
+      const collection = db.collection('priceHistory');
+
+      const page = parseInt(req.query.page as string) || 1;
+      const limit = parseInt(req.query.limit as string) || 100;
+      const skip = (page - 1) * limit;
+
+      const filter: any = {
+        timestamp: new Date(),
+      };
+
+      if (req.query.category) {
+        filter.idCategory = req.query.category as string;
+      }
+
+      if (req.query.expansion) {
+        filter.idExpansion = Number(req.query.expansion) ?? 0;
+      }
+
+      if (req.query.rarity) {
+        filter.rarity = req.query.rarity as string;
+      }
+
+      if (req.query.maxPrice) {
+        filter.avg = { $gte: Number(req.query.minPrice) };
+      }
+
+      // Gestione parametro sort
+      let sortField = 'deltaPrice';
+      if (req.query.sort && ['deltaPrice', 'deltaLow', 'avg'].includes(req.query.sort as string)) {
+        sortField = req.query.sort as string;
+      }
+      const [prices, total] = await Promise.all([
+        collection
+          .find(filter)
+          .sort({ [sortField]: -1 })
+          .skip(skip)
+          .limit(limit)
+          .toArray(),
+        collection.countDocuments(filter),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      res.json({
+        data: prices,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages,
+          hasNext: page < totalPages,
+          hasPrev: page > 1,
+        },
+      });
+    } catch (error: any) {
+      console.error('Get prices error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
   // GET /api/prices/:id - Storico prezzi per un prodotto
   app.get('/api/prices/:id', authenticate, async (req, res) => {
     try {

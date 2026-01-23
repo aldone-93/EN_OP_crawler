@@ -101,51 +101,47 @@ export function setupHealthRoutes(app: express.Application, authenticate: expres
 export function getHomepageHTML(): string {
   return `
     <!DOCTYPE html>
-    <html>
-    <head>
-      <title>One Piece TCG API</title>
-      <style>
-        body {
-          font-family: Arial, sans-serif;
-          max-width: 1000px;
-          margin: 50px auto;
-          padding: 20px;
-          background: #f5f5f5;
-        }
-        .card {
-          background: white;
-          border-radius: 8px;
-          padding: 20px;
-          margin: 20px 0;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .status-ok { color: #28a745; font-weight: bold; }
-        .status-error { color: #dc3545; font-weight: bold; }
-        h1, h2 { color: #333; }
-        .endpoint {
-          background: #f8f9fa;
-          padding: 15px;
-          margin: 10px 0;
-          border-radius: 5px;
-          border-left: 4px solid #007bff;
-        }
-        .method {
-          display: inline-block;
-          padding: 4px 8px;
-          background: #007bff;
-          color: white;
-          border-radius: 4px;
-          font-size: 12px;
-          font-weight: bold;
-          margin-right: 10px;
-        }
-        code {
-          background: #e9ecef;
-          padding: 2px 6px;
-          border-radius: 3px;
-          font-family: 'Courier New', monospace;
-        }
-        .info-row {
+      <div class="card">
+        <h2>📚 API Endpoints</h2>
+        
+        <h3>Products</h3>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/products</code></div>
+          <p>Get paginated list of products with optional filters.</p>
+          <p><strong>Params:</strong> page, limit, name, category, expansion, rarity, <b>cardCode</b></p>
+        </div>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/products/:id</code></div>
+          <p>Get single product by ID</p>
+        </div>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/categories</code></div>
+          <p>Get list of all categories</p>
+        </div>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/expansions</code></div>
+          <p>Get list of all expansions</p>
+        </div>
+        
+        <h3>Prices</h3>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/prices</code></div>
+          <p>Get paginated price records (time series)</p>
+          <p><strong>Params:</strong> page, limit, category, expansion, rarity, <b>maxPrice</b> (price ≤ maxPrice), <b>minPrice</b> (price ≥ minPrice)</p>
+        </div>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/prices/:id</code></div>
+          <p>Get price history (time series) for a product</p>
+          <p><strong>Params:</strong> page, limit, from, to</p>
+        </div>
+        <div class="endpoint">
+          <div><span class="method">GET</span><code>/api/prices/:id/latest</code></div>
+          <p>Get most recent price for a product</p>
+        </div>
+        
+        <h3>🔐 Authentication</h3>
+        <p>Header: <code>X-Api-Key: your-key</code> or query: <code>?key=your-key</code></p>
+      </div>
           display: flex;
           justify-content: space-between;
           padding: 10px 0;
