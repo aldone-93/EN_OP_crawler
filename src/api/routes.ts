@@ -16,15 +16,15 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
       const filter: any = {};
 
       if (req.query.name) {
-        filter.enName = { $regex: req.query.name as string, $options: 'i' };
+        filter.name = { $regex: req.query.name as string, $options: 'i' };
       }
 
       if (req.query.category) {
-        filter.categoryName = req.query.category as string;
+        filter.idCategory = req.query.category as string;
       }
 
       if (req.query.expansion) {
-        filter.expansionName = { $regex: req.query.expansion as string, $options: 'i' };
+        filter.idExpansion = Number(req.query.expansion) ?? 0;
       }
 
       if (req.query.rarity) {
