@@ -2,8 +2,14 @@ import express from 'express';
 import 'dotenv/config';
 import { setupApiRoutes } from './routes';
 import { setupHealthRoutes, getHomepageHTML } from '../health/routes';
+import cors from 'cors';
+
+const options = {
+  origin: 'https://pricepiece-production.up.railway.app',
+};
 
 const app = express();
+app.use(cors(options));
 const PORT = process.env.PORT || 3000;
 const API_KEY = process.env.API_KEY;
 
