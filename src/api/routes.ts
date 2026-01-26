@@ -95,7 +95,10 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
       const skip = (page - 1) * limit;
 
       const filter: any = {
-        timestamp: new Date(),
+        timestamp: {
+          $gte: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+          $lte: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+        },
       };
 
       if (req.query.category) {
@@ -115,8 +118,8 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
       }
 
       // Gestione parametro sort
-      let sortField = 'deltaPrice';
-      if (req.query.sort && ['deltaPrice', 'deltaLow', 'avg'].includes(req.query.sort as string)) {
+      let sortField = 'priceDelta';
+      if (req.query.sort && ['priceDelta', 'minPriceDelta', 'avg'].includes(req.query.sort as string)) {
         sortField = req.query.sort as string;
       }
       const [prices, total] = await Promise.all([

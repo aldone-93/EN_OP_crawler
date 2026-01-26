@@ -23,7 +23,7 @@ export async function getPriceList() {
       return {
         ...priceGuide,
         // Calcola la variazione di prezzo rispetto all'ultimo record nel database
-        priceDelta: await calcDelta(lastRecord, priceGuide, 'trendPrice'),
+        priceDelta: await calcDelta(lastRecord, priceGuide, 'trend'),
         minPriceDelta: await calcDelta(lastRecord, priceGuide, 'low'),
       };
     })
