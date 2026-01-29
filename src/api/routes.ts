@@ -94,43 +94,58 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
       const limit = parseInt(req.query.limit as string) || 100;
       const skip = (page - 1) * limit;
 
-      const filter: any = {
+      let match: any = {
         timestamp: {
           $gte: new Date(new Date().setUTCHours(0, 0, 0, 0)),
           $lte: new Date(new Date().setUTCHours(23, 59, 59, 999)),
         },
+
+        avg1: { $gt: 0 },
       };
 
       if (req.query.category) {
-        filter.idCategory = req.query.category as string;
+        match['idCategory'] = req.query.category as string;
       }
 
-      if (req.query.expansion) {
-        filter.idExpansion = Number(req.query.expansion) ?? 0;
+      if (Number(req.query.minPrice) > 0) {
+        match['avg1'] = { $gte: Number(req.query.minPrice) };
       }
 
-      if (req.query.rarity) {
-        filter.rarity = req.query.rarity as string;
+      if (Number(req.query.maxPrice) > 0) {
+        match['avg1'] = { $lte: Number(req.query.maxPrice) };
       }
 
-      if (req.query.maxPrice) {
-        filter.avg = { $gte: Number(req.query.minPrice) };
-      }
+      const agg = [
+        {
+          $match: match,
+        },
+        {
+          $sort: {
+            priceDelta: -1,
+          },
+        },
+        {
+          $skip: skip * page,
+        },
+        {
+          $limit: limit,
+        },
+        {
+          $lookup: {
+            from: 'products',
+            localField: 'idProduct',
+            foreignField: 'idProduct',
+            as: 'productsInfo',
+          },
+        },
+      ];
 
       // Gestione parametro sort
       let sortField = 'priceDelta';
       if (req.query.sort && ['priceDelta', 'minPriceDelta', 'avg'].includes(req.query.sort as string)) {
         sortField = req.query.sort as string;
       }
-      const [prices, total] = await Promise.all([
-        collection
-          .find(filter)
-          .sort({ [sortField]: -1 })
-          .skip(skip)
-          .limit(limit)
-          .toArray(),
-        collection.countDocuments(filter),
-      ]);
+      const [prices, total] = await Promise.all([collection.aggregate(agg).toArray(), collection.countDocuments(match)]);
 
       const totalPages = Math.ceil(total / limit);
 
