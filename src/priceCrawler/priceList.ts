@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { getDBClient } from '../core/dbAuth/mongoAuth';
 import { Collection } from 'mongodb';
 
-export async function getPriceList() {
+export async function getPriceList(productsList: any[]) {
   console.log('Downloading price guide...');
 
   if (!process.env.PRICES_URL) {
@@ -25,6 +25,7 @@ export async function getPriceList() {
         // Calcola la variazione di prezzo rispetto all'ultimo record nel database
         priceDelta: await calcDelta(lastRecord, priceGuide, 'avg1'),
         minPriceDelta: await calcDelta(lastRecord, priceGuide, 'low'),
+        idExpansion: productsList.find((p) => p.idProduct === priceGuide.idProduct)?.idExpansion || null,
       };
     })
   );

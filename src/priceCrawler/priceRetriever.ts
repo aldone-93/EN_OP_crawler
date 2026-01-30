@@ -12,7 +12,7 @@ cron.schedule('0 2 * * *', async () => {
 
 export async function downloadAndMerge() {
   const productsList = await getSinglesList();
-  const priceList = await getPriceList();
+  const priceList = await getPriceList(productsList);
 
   console.log(`Fetched ${productsList.length} products and ${priceList.length} prices`);
 
