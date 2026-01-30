@@ -94,41 +94,38 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
       const limit = parseInt(req.query.limit as string) || 100;
       const skip = (page - 1) * limit;
 
-      let match: any = {
-        timestamp: {
-          $gte: new Date(new Date().setUTCHours(0, 0, 0, 0)),
-          $lte: new Date(new Date().setUTCHours(23, 59, 59, 999)),
-        },
+      const deltaChoice = (req.query.sort as string) ?? 'priceDelta';
 
+      const attribute = deltaChoice === 'minPriceDelta' ? 'low' : 'avg1';
+
+      let match: any = {
         avg1: { $gt: 0 },
       };
 
       if (req.query.category) {
-        match['idCategory'] = req.query.category as string;
+        match['productsInfo.idCategory'] = req.query.category as string;
+      }
+
+      if (Number(req.query.expansion) > 0) {
+        match['productsInfo.idExpansion'] = Number(req.query.expansion);
       }
 
       if (Number(req.query.minPrice) > 0) {
-        match['avg1'] = { $gte: Number(req.query.minPrice) };
+        match[attribute] = { $gte: Number(req.query.minPrice) };
       }
 
       if (Number(req.query.maxPrice) > 0) {
-        match['avg1'] = { $lte: Number(req.query.maxPrice) };
+        match[attribute] = { $lte: Number(req.query.maxPrice) };
       }
 
       const agg = [
         {
-          $match: match,
-        },
-        {
-          $sort: {
-            priceDelta: -1,
+          $match: {
+            timestamp: {
+              $gte: new Date(new Date().setUTCHours(0, 0, 0, 0)),
+              $lte: new Date(new Date().setUTCHours(23, 59, 59, 999)),
+            },
           },
-        },
-        {
-          $skip: skip * page,
-        },
-        {
-          $limit: limit,
         },
         {
           $lookup: {
@@ -138,13 +135,22 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
             as: 'productsInfo',
           },
         },
+        {
+          $match: match,
+        },
+        {
+          $sort: {
+            [deltaChoice]: -1,
+          },
+        },
+        {
+          $skip: skip * page,
+        },
+        {
+          $limit: limit,
+        },
       ];
 
-      // Gestione parametro sort
-      let sortField = 'priceDelta';
-      if (req.query.sort && ['priceDelta', 'minPriceDelta', 'avg'].includes(req.query.sort as string)) {
-        sortField = req.query.sort as string;
-      }
       const [prices, total] = await Promise.all([collection.aggregate(agg).toArray(), collection.countDocuments(match)]);
 
       const totalPages = Math.ceil(total / limit);
