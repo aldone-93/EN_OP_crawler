@@ -194,7 +194,7 @@ export function setupApiRoutes(app: express.Application, authenticate: express.R
       const limit = parseInt(req.query.limit as string) || 100;
       const skip = (page - 1) * limit;
 
-      const [prices, total] = await Promise.all([collection.find(dateFilter).sort({ timestamp: -1 }).skip(skip).limit(limit).toArray(), collection.countDocuments(dateFilter)]);
+      const [prices, total] = await Promise.all([collection.find(dateFilter).sort({ timestamp: 1 }).skip(skip).limit(limit).toArray(), collection.countDocuments(dateFilter)]);
 
       if (prices.length === 0 && page === 1) {
         return res.status(404).json({ error: 'No price data found for this product' });
