@@ -22,12 +22,15 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@types/cheerio": "^0.22.35",
     "@vercel/blob": "^2.0.1",
+    "cheerio": "^1.2.0",
     "concurrently": "^9.2.1",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mongodb": "^7.0.0",
-    "node-cron": "^4.2.1"
+    "node-cron": "^4.2.1",
+    "puppeteer": "^24.37.1"
   }
 }
