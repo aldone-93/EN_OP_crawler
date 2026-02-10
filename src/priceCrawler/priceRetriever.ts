@@ -3,9 +3,9 @@ import { getSinglesList } from './singleList';
 import { getPriceList } from './priceList';
 import { getDBClient } from '../core/dbAuth/mongoAuth';
 
-// Ogni giorno alle 2:00 AM
+// Ogni giorno alle 11:00 AM
 console.log('Starting CRON...');
-cron.schedule('0 2 * * *', async () => {
+cron.schedule('0 11 * * *', async () => {
   console.log('Downloading and merging data...');
   await downloadAndMerge();
 });
